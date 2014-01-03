@@ -1816,6 +1816,24 @@ sub _HTMLFormatter {
             RT->Logger->info("Using internal Perl HTML -> text conversion");
             require HTML::FormatText::WithLinks::AndTables;
             $formatter = \&_HTMLFormatText;
+        } elsif ($prog eq "perl") {
+            unless (HTML::HTML5::ToText->require) {
+                RT->Logger->warn("Could not load HTML::HTML5::ToText; install it from CPAN")
+                    if $wanted;
+                next;
+            }
+            my $obj = HTML::HTML5::ToText->new_with_traits(
+                traits => [qw/ShowLinks ShowImages RenderTables TextFormatting/],
+            );
+            RT->Logger->info("Using HTML::HTML5::ToText for HTML -> text conversion");
+            $formatter = sub {
+                my $text;
+                eval {
+                    $text = $obj->process_string( @_ ) // '';
+                };
+                $RT::Logger->error("Failed to downgrade HTML to plain text: $@") if $@;
+                return $text;
+            };
         } else {
             my $package = "HTML::FormatText::" . ucfirst($prog);
             unless ($package->require) {

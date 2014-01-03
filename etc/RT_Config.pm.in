@@ -715,16 +715,18 @@ Set($ForwardFromUser, 0);
 
 =item C<$HTMLFormatter>
 
-The external HTML formatter to use.  The default is to try, in order,
-C<w3m>, C<elinks>, C<html2text>, C<links>, C<lynx>, and then fall back
-to the C<core> pure-perl formatter.  The pure-perl formatter is
+The external HTML formatter to use.  The default is to try, in order, an
+improved perl formatter (C<perl>), the external programs C<w3m>,
+C<elinks>, C<html2text>, C<links>, or C<lynx>, and then fall back to the
+C<core> pure-perl formatter.  The C<perl> and C<core> formatters are
 significantly faster than the others, but may fail to successfully
 convert even on some relatively simple HTML.  Falls back to C<core> if
 the configured program is not installed.
 
-Using formatters other than C<core> requires that the
-L<HTML::FormatExternal> module be installed; it is an optional
-dependency which RT will not install by default.
+Using the C<perl> formatter requires the L<HTML::HTML5::ToText> optional
+module be installed.  Using external formatters (i.e. C<w3m>, etc)
+requires that the L<HTML::FormatExternal> module be installed.  Neither
+of these modules are installed by RT by default.
 
 =cut
 
