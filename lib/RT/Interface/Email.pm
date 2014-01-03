@@ -1827,6 +1827,7 @@ sub _HTMLFormatter {
             );
             RT->Logger->info("Using HTML::HTML5::ToText for HTML -> text conversion");
             $formatter = sub {
+                local $SIG{__WARN__};
                 my $text;
                 eval {
                     $text = $obj->process_string( @_ ) // '';
