@@ -713,6 +713,23 @@ will use the address of the current user and remove RT's subject tag.
 
 Set($ForwardFromUser, 0);
 
+=item C<$HTMLFormatter>
+
+The external HTML formatter to use.  The default is to try, in order,
+C<w3m>, C<elinks>, C<html2text>, C<links>, C<lynx>, and then fall back
+to the C<core> pure-perl formatter.  The pure-perl formatter is
+significantly faster than the others, but may fail to successfully
+convert even on some relatively simple HTML.  Falls back to C<core> if
+the configured program is not installed.
+
+Using formatters other than C<core> requires that the
+L<HTML::FormatExternal> module be installed; it is an optional
+dependency which RT will not install by default.
+
+=cut
+
+Set($HTMLFormatter, undef);
+
 =back
 
 =head2 Email dashboards
