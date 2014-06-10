@@ -1884,9 +1884,65 @@ sub BasedOnObj {
 }
 
 
+sub SupportDefaultValues {
+    my $self = shift;
+    return 0 unless $self->id;
+    return 0 unless $self->LookupType =~ /RT::Ticket$/;
+    return $self->Type !~ /^(?:Image|Binary)$/;
+}
 
+sub DefaultValues {
+    my $self = shift;
+    my %args = (
+        Object => RT->System,
+        @_,
+    );
+    my $attr = $args{Object}->FirstAttribute('CustomFieldDefaultValues');
+    return $attr->Content->{$self->id} if $attr && $attr->Content;
+    return undef;
+}
 
+sub SetDefaultValues {
+    my $self = shift;
+    my %args = (
+        Object => RT->System,
+        Values => undef,
+        @_,
+    );
+    my $attr = $args{Object}->FirstAttribute( 'CustomFieldDefaultValues' );
+    my ( $old_content, $old_values );
+    $old_content = $attr->Content if $attr && $attr->Content;
+    $old_values = $old_content->{ $self->id } if $old_content;
 
+    my $ret = $args{Object}->SetAttribute(
+        Name    => 'CustomFieldDefaultValues',
+        Content => {
+            %{ $old_content || {} }, $self->id => $args{Values},
+        },
+    );
+
+    if ( defined $old_values && length $old_values ) {
+        $old_values = join ', ', @$old_values if ref $old_values eq 'ARRAY';
+    }
+    else {
+        $old_values = $self->loc('(no value)');
+    }
+
+    my $new_values = $args{Values};
+    if ( defined $new_values && length $new_values ) {
+        $new_values = join ', ', @$new_values if ref $new_values eq 'ARRAY';
+    }
+    else {
+        $new_values = $self->loc( '(no value)' );
+    }
+
+    if ( $ret ) {
+        return ( $ret, $self->loc( 'Default values changed from [_1] to [_2]', $old_values, $new_values ) );
+    }
+    else {
+        return ( $ret, $self->loc( "Can't change default values from [_1] to [_2]", $old_values, $new_values ) );
+    }
+}
 
 =head2 id
 
