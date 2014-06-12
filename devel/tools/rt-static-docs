@@ -154,6 +154,8 @@ for my $file (<README* UPGRADING*>) {
 
     $str = "<pre>$str</pre>";
     $str =~ s{\bdocs/([a-z_-]+)\.pod\b}{<a href="$1.html">docs/$1.pod</a>}g;
+    $str =~ s{\b(https?://[.a-z0-9/-]+(?<!\.))}{<a href="$1">$1</a>}g;
+    $str =~ s{\b(\w+\@bestpractical.com)\b}{<a href="mailto:$1">$1</a>}g;
 
     open my $html, ">", $dest
         or warn "Can't open $dest: $!", next;
