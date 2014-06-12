@@ -11,6 +11,12 @@ before you upgrade and look for changes to features you currently use.
 
 =item *
 
+Please run C<etc/upgrade/upgrade-queue-defaults> on old RT before upgrading.
+In 4.4, we dropped some columns in Queues table, the script is to migrate the
+column values into other places.
+
+=item *
+
 The support for C<jsmin> (via the C<$JSMinPath> configuration) has been
 removed in favor of a built-in solution.
 

@@ -432,6 +432,7 @@ AC_CONFIG_FILES([
                  etc/upgrade/split-out-cf-categories
                  etc/upgrade/generate-rtaddressregexp
                  etc/upgrade/upgrade-articles
+                 etc/upgrade/upgrade-queue-defaults
                  etc/upgrade/vulnerable-passwords
                  etc/upgrade/switch-templates-to
                  sbin/rt-attributes-viewer
