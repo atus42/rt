@@ -105,6 +105,7 @@
           CustomFields => $QueueObj->TicketCustomFields,
           Grouping => 'Basics',
           InTable => 1,
+          DefaultValuesFromObject => $QueueObj,
       &>
       <& /Ticket/Elements/EditTransactionCustomFields, %ARGS, QueueObj => $QueueObj, InTable => 1 &>
     </table>
@@ -115,6 +116,7 @@
     %ARGS,
     Object => $ticket,
     CustomFieldGenerator => sub { $QueueObj->TicketCustomFields },
+    DefaultValuesFromObject => $QueueObj,
 &>
 
 </div>
@@ -169,6 +171,7 @@
     CustomFields => $QueueObj->TicketCustomFields,
     Grouping => 'People',
     InTable => 1,
+    DefaultValuesFromObject => $QueueObj,
 &>
 
 <tr>
@@ -263,6 +266,7 @@
     CustomFields => $QueueObj->TicketCustomFields,
     Grouping => 'Dates',
     InTable => 1,
+    DefaultValuesFromObject => $QueueObj,
 &>
 </table>
 </&>
@@ -278,6 +282,7 @@
     Object          => $ticket,
     CustomFields    => $QueueObj->TicketCustomFields,
     ARGSRef         => \%ARGS,
+    DefaultValuesFromObject => $QueueObj,
     &>
 </&>
 </div>

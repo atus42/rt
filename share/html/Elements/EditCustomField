@@ -91,7 +91,7 @@ if ( ( !defined $Default || !length $Default ) && $DefaultsFromTopArguments ) {
 }
 
 if ( (!$Object || !$Object->id) && ( !defined $Default || !length $Default ) && $CustomField->SupportDefaultValues ) {
-    $Default = $CustomField->DefaultValues;
+    $Default = $CustomField->DefaultValues(Object => $ARGS{DefaultValuesFromObject} || RT->System);
 }
 
 my $MaxValues = $CustomField->MaxValues;
