@@ -52,24 +52,84 @@
 <form method="post" action="DefaultValues.html" name="ModifyDefaultValues" id="ModifyDefaultValues">
 <input type="hidden" name="id" value="<% $queue->id %>" />
 
-<h2><&|/l&>Core Fields</&></h2>
-<table border="0">
-<tr><td class="label"><&|/l&>Priority</&>:</td>
-<td><& /Elements/SelectPriority,
-    Name => "InitialPriority",
-    Default => $queue->DefaultValue('InitialPriority'),
-&></td></tr>
-<tr><td class="label"><&|/l&>Final Priority</&>:</td>
-<td><& /Elements/SelectPriority,
-    Name => "FinalPriority",
-    Default => $queue->DefaultValue('FinalPriority'),
-&><br /><span><em><&|/l&>requires running rt-crontool</&></em></span></td></tr>
-<tr><td class="label"><&|/l&>Starts</&>:</td><td><& /Elements/SelectDate, Name => "Starts", Default => $queue->DefaultValue('Starts') || '' &></td></tr>
-<tr><td class="label"><&|/l&>Due</&>:</td><td><& /Elements/SelectDate, Name => "Due", Default => $queue->DefaultValue('Due') || '' &></td></tr>
-</table>
+<div class="ticket-info-basics">
+    <&| /Widgets/TitleBox, title => loc('Basics') &>
+    <table border="0">
+    <tr><td class="label"><&|/l&>Priority</&>:</td>
+    <td><& /Elements/SelectPriority,
+        Name => "InitialPriority",
+        Default => $queue->DefaultValue('InitialPriority'),
+    &></td></tr>
+    <tr><td class="label"><&|/l&>Final Priority</&>:</td>
+    <td><& /Elements/SelectPriority,
+        Name => "FinalPriority",
+        Default => $queue->DefaultValue('FinalPriority'),
+    &><br /><span><em><&|/l&>requires running rt-crontool</&></em></span></td></tr>
+    <& /Elements/EditCustomFields,
+        NamePrefix => 'Default-',
+        Object => RT::Ticket->new($session{CurrentUser}),
+        CustomFields => $queue->TicketCustomFields,
+        Grouping => 'Basics',
+        InTable => 1,
+        QueueObj => $queue,
+    &>
+    </table>
+    </&>
+</div>
 
-<h2><&|/l&>Ticket Custom Fields</&></h2>
-<& /Elements/EditCustomFields, CustomFields => $ticket_cfs, NamePrefix => 'Default-', Object => RT::Ticket->new($session{CurrentUser}), QueueObj => $queue &>
+<div class="ticket-info-dates">
+    <&|/Widgets/TitleBox, title => loc("Dates") &>
+    <table>
+    <tr><td class="label"><&|/l&>Starts</&>:</td><td><& /Elements/SelectDate, Name => "Starts", Default => $queue->DefaultValue('Starts') || '' &></td></tr>
+    <tr><td class="label"><&|/l&>Due</&>:</td><td><& /Elements/SelectDate, Name => "Due", Default => $queue->DefaultValue('Due') || '' &></td></tr>
+    <& /Elements/EditCustomFields,
+        NamePrefix => 'Default-',
+        Object => RT::Ticket->new($session{CurrentUser}),
+        CustomFields => $queue->TicketCustomFields,
+        Grouping => 'Dates',
+        InTable => 1,
+        QueueObj => $queue,
+    &>
+    </table>
+    </&>
+</div>
+
+% my $groupings = RT->Config->Get('CustomFieldGroupings');
+% if ( $groupings && $groupings->{'RT::Ticket'} && grep { $_ eq 'People' } @{$groupings->{'RT::Ticket'}} ) {
+<div class="ticket-info-people">
+    <&|/Widgets/TitleBox, title => loc("People") &>
+    <table>
+    <& /Elements/EditCustomFields,
+        NamePrefix => 'Default-',
+        Object => RT::Ticket->new($session{CurrentUser}),
+        CustomFields => $queue->TicketCustomFields,
+        Grouping => 'People',
+        InTable => 1,
+        QueueObj => $queue,
+    &>
+    </table>
+    </&>
+</div>
+% }
+
+% if ( $groupings && $groupings->{'RT::Ticket'} && grep { $_ eq 'Links' } @{$groupings->{'RT::Ticket'}} ) {
+<div class="ticket-info-links">
+    <&|/Widgets/TitleBox, title => loc("Links") &>
+    <table>
+    <& /Elements/EditCustomFields,
+        NamePrefix => 'Default-',
+        Object => RT::Ticket->new($session{CurrentUser}),
+        CustomFields => $queue->TicketCustomFields,
+        Grouping => 'Links',
+        InTable => 1,
+        QueueObj => $queue,
+    &>
+    </table>
+    </&>
+</div>
+% }
+
+<& /Elements/EditCustomFieldCustomGroupings, CustomFieldGenerator => sub { $queue->TicketCustomFields }, NamePrefix => 'Default-', Object => RT::Ticket->new($session{CurrentUser}), QueueObj => $queue &>
 
 <& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
 </form>
