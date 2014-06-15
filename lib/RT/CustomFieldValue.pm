@@ -119,6 +119,17 @@ sub _Set {
     return $self->SUPER::_Set( @_ ); 
 } 
 
+sub SetName {
+    my $self = shift;
+    my $value = shift;
+    my ( $ret, $msg ) = $self->_Set(
+        Field => 'Name',
+        Value => $value,
+    );
+
+    $self->CustomFieldObj->CleanupDefaultValues if $self->CustomFieldObj && $self->CustomFieldObj->SupportDefaultValues;
+    return ( $ret, $msg );
+}
 
 =head2 id
 

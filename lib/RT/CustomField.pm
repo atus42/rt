@@ -564,6 +564,7 @@ sub DeleteValue {
     unless ( $retval ) {
         return (0, $self->loc("Custom field value could not be deleted"));
     }
+    $self->CleanupDefaultValues;
     return ($retval, $self->loc("Custom field value deleted"));
 }
 
@@ -1960,6 +1961,40 @@ sub SetDefaultValues {
     }
     else {
         return ( $ret, $self->loc( "Can't change default values from [_1] to [_2]", $old_values, $new_values ) );
+    }
+}
+
+sub CleanupDefaultValues {
+    my $self = shift;
+    return unless $self->Type eq 'Select' && $self->SupportDefaultValues;
+
+    my @values = map { $_->Name } @{$self->Values->ItemsArrayRef || []};
+    my $attrs = RT::Attributes->new( $self->CurrentUser );
+    $attrs->Limit( FIELD => 'Name', VALUE => 'CustomFieldDefaultValues' );
+    while ( my $attr = $attrs->Next ) {
+        my $content = $attr->Content;
+        next unless $content;
+        my $default_values = $content->{ $self->id };
+        return unless $default_values;
+        my $changed;
+        if ( ref $default_values eq 'ARRAY' ) {
+            my @new_defaults;
+            for my $default ( @$default_values ) {
+                if ( grep { $_ eq $default } @values ) {
+                    push @new_defaults, $default;
+                }
+                else {
+                    $changed ||= 1;
+                }
+            }
+
+            $content->{$self->id} = \@new_defaults if $changed;
+        }
+        elsif ( ! grep { $_ eq $default_values } @values ) {
+            delete $content->{ $self->id };
+            $changed = 1;
+        }
+        $attr->SetContent( $content ) if $changed;
     }
 }
 
